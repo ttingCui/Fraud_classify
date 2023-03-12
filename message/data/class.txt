@@ -1,0 +1,14 @@
+AD_Loan
+AD_Network_service
+AD_Other
+AD_Real_estate
+AD_Retail
+FR_Financial
+FR_Other
+FR_Phishing(Bank)
+FR_Phishing(Other)
+IL_Escort_service
+IL_Fake_ID_and_invoice
+IL_Gambling
+IL_Political_propaganda
+No_fraud
