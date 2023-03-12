@@ -9,6 +9,7 @@ from transformers import BertTokenizer, BertModel
 from read_data import ret_loader
 from bert import Config, BertClassifier
 from importlib import import_module
+from logger import logger
 
 from torch.utils.data import Dataset, DataLoader
 
@@ -59,7 +60,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
             if (i + 1) % log_interval == 0:
                 avg_loss = running_loss / log_interval
                 train_losses.append(avg_loss)
-                print(f'Epoch [{epoch + 1}/{config.num_epochs}] Batch [{i + 1}] Loss: {avg_loss:.4f}')
+                logger.info(f'Epoch [{epoch + 1}/{config.num_epochs}] Batch [{i + 1}] Loss: {avg_loss:.4f}')
                 running_loss = 0.0
 
             if (i + 1) % eval_interval == 0:
@@ -67,13 +68,14 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
                 val_losses.append(val_loss)
                 val_accs.append(val_acc)
                 if val_acc > best_val_acc:
-                    print(f'New best validation accuracy: {val_acc:.4f}')
+                    logger.info(f'New best validation accuracy: {val_acc:.4f}')
                     best_val_acc = val_acc
                     best_model_params = model.state_dict()
                     torch.save(best_model_params, config.save_path)
 
     test_loss, test_acc = evaluate(model, test_loader, criterion, device)
-    print(f'Test loss: {test_loss:.4f}, Test accuracy: {test_acc:.4f}')
+
+    logger.info(f'Test loss: {test_loss:.4f}, Test accuracy: {test_acc:.4f}')
 
     return train_losses, val_losses, val_accs
 
