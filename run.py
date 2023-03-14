@@ -93,10 +93,11 @@ def evaluate(model, dataloader, criterion, device):
             labels = batch['labels'].to(device)
 
             outputs = model(input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
-            loss = criterion(logits, labels)
+            # logits = outputs.logits
+            loss = criterion(outputs, labels)
 
-            _, predicted = torch.max(logits, 1)
+            # torch.return_types.max(values=tensor([0.8475, 1.1949, 1.5717, 1.0036]), indices=tensor([3, 0, 0, 1]))
+            _, predicted = torch.max(outputs, 1)
             total_correct += (predicted == labels).sum().item()
             total_count += labels.size(0)
             total_loss += loss.item() * labels.size(0)
