@@ -32,10 +32,24 @@ def random_file(filein, fileout):
 
 
 if __name__ == '__main__':
-    # get_fewshot_data("../../cache/data_class", "../../message/fewshotdata/train_tmp.txt", "../../message/fewshotdata/dev_tmp.txt", "../../message/fewshotdata/test_tmp.txt")
-    random_file("../../message/fewshotdata/train_tmp.txt", "../../message/fewshotdata/train.txt")
-    random_file("../../message/fewshotdata/dev_tmp.txt", "../../message/fewshotdata/dev.txt")
-    random_file("../../message/fewshotdata/test_tmp.txt", "../../message/fewshotdata/test.txt")
-    # 将数据按照测试集3000验证集1500划分
-    # split_num("../message/data/all_data.txt", "../message/data/train_dev.txt", "../message/data/test.txt", 3000)
-    # split_num("../message/data/train_dev.txt", "../message/data/train.txt", "../message/data/dev.txt", 1500)
+    # get_fewshot_data("../../cache/data_class", "../../message/fewshotdata_8/train_tmp.txt", "../../message/fewshotdata_8/dev_tmp.txt", "../../message/fewshotdata_8/test_tmp.txt", class_num=8)
+    # random_file("../../message/fewshotdata_8/train_tmp.txt", "../../message/fewshotdata_8/train.txt")
+    # random_file("../../message/fewshotdata_8/dev_tmp.txt", "../../message/fewshotdata_8/dev.txt")
+    # random_file("../../message/fewshotdata_8/test_tmp.txt", "../../message/fewshotdata_8/test.txt")
+
+    # get_fewshot_data("../../cache/data_class", "../../message/fewshotdata_16/train_tmp.txt", "../../message/fewshotdata_16/dev_tmp.txt", "../../message/fewshotdata_16/test_tmp.txt")
+    # random_file("../../message/fewshotdata_16/train_tmp.txt", "../../message/fewshotdata_16/train.txt")
+    # random_file("../../message/fewshotdata_16/dev_tmp.txt", "../../message/fewshotdata_16/dev.txt")
+    # random_file("../../message/fewshotdata_16/test_tmp.txt", "../../message/fewshotdata_16/test.txt")
+
+    # get_fewshot_data("../../cache/data_class", "../../message/fewshotdata_32/train_tmp.txt",
+    #                  "../../message/fewshotdata_32/dev_tmp.txt", "../../message/fewshotdata_32/test_tmp.txt", class_num=32)
+    # random_file("../../message/fewshotdata_32/train_tmp.txt", "../../message/fewshotdata_32/train.txt")
+    # random_file("../../message/fewshotdata_32/dev_tmp.txt", "../../message/fewshotdata_32/dev.txt")
+    # random_file("../../message/fewshotdata_32/test_tmp.txt", "../../message/fewshotdata_32/test.txt")
+
+    get_fewshot_data("../../cache/data_class", "../../message/fewshotdata_64/train_tmp.txt",
+                     "../../message/fewshotdata_64/dev_tmp.txt", "../../message/fewshotdata_64/test_tmp.txt", class_num=64)
+    random_file("../../message/fewshotdata_64/train_tmp.txt", "../../message/fewshotdata_64/train.txt")
+    random_file("../../message/fewshotdata_64/dev_tmp.txt", "../../message/fewshotdata_64/dev.txt")
+    random_file("../../message/fewshotdata_64/test_tmp.txt", "../../message/fewshotdata_64/test.txt")
