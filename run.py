@@ -1,33 +1,16 @@
 # -*- coding = utf-8 -*-
 # 2023/3/10 22:14
 
-
+import sys
 import torch
 import torch.nn as nn
-from transformers import BertTokenizer, BertModel
 
 from read_data import ret_loader
-from bert import Config, BertClassifier
-from importlib import import_module
+from models.bert import Config, BertClassifier
 from logger import logger
 
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
-
-class MyDataset(Dataset):
-    def __init__(self, data, tokenizer):
-        self.texts = [d[0] for d in data]
-        self.labels = [d[1] for d in data]
-        self.tokenizer = tokenizer
-
-    def __len__(self):
-        return len(self.texts)
-
-    def __getitem__(self, idx):
-        inputs = self.tokenizer(self.texts[idx], truncation=True, padding='max_length', max_length=128,
-                                return_tensors='pt')
-        return {'input_ids': inputs['input_ids'][0], 'attention_mask': inputs['attention_mask'][0],
-                'labels': torch.tensor(self.labels[idx])}
 
 
 def train(model, train_loader, val_loader, test_loader, optimizer, criterion, config, log_interval=20, eval_interval=200):
@@ -109,7 +92,7 @@ def evaluate(model, dataloader, criterion, device):
 
 
 # 加载数据集位置 获取相关配置信息
-dataset = "message"
+dataset = sys.argv[1]
 config = Config(dataset)
 # 加载预训练模型
 model = BertClassifier(config)
