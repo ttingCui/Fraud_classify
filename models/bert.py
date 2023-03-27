@@ -17,8 +17,9 @@ class Config(object):
         # self.train_path = dataset + '/data/train.txt'                                # 训练集
         # self.dev_path = dataset + '/data/dev.txt'                                    # 验证集
         # self.test_path = dataset + '/data/test.txt'                                  # 测试集
-        self.class_list = [x.strip() for x in open(
-            dataset + '/data/class.txt').readlines()]                                # 类别名单
+        # self.class_list = [x.strip() for x in open(
+        #     dataset + '/data/class.txt').readlines()]                                # 类别名单
+        self.class_list = [x.strip() for x in open('message/data/class.txt').readlines()]                                # 类别名单
         self.save_path = dataset + '/saved_dict/' + self.model_name + '.pt'        # 模型训练结果
         # self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
         self.device = torch.device('cpu')
@@ -43,7 +44,10 @@ class BertClassifier(nn.Module):
                 param.requires_grad = False
 
     def forward(self, input_ids, attention_mask):
+        # output: BaseModelOutputWithPoolingSAndCrossAttention [batchsize, seq_len, hiddensize]
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        # polled_output: [batchsize, hiddensize]
         pooled_output = outputs[1]
+        # logits: [batchsize, classnum]
         logits = self.classifier(pooled_output)
         return logits
