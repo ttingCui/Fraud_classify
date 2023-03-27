@@ -135,6 +135,7 @@ config.tokenizer.add_tokens(config.special_tokens)
 # 加载预训练模型
 model = BertClassifier(config)
 model.resize_token_embeddings(len(config.tokenizer))
+model.classifier.load_cls(config)
 model.classifier.update_classifier(torch.as_tensor(config.classifier_indices, dtype=torch.long))
 # 定义优化器
 optimizer = torch.optim.Adam(model.parameters(), config.learning_rate)

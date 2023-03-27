@@ -15,7 +15,8 @@ class Config(object):
         self.test_path = dataset + '/test.txt'                                  # 测试集
         self.class_list = [x.strip() for x in open('message/data/class.txt').readlines()]                                # 类别名单
         self.save_path = dataset + '/saved_dict/' + self.model_name + '.pt'        # 模型训练结果
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
+        # self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
+        self.device = torch.device('cpu')   # 设备
 
         self.num_classes = len(self.class_list)                         # 类别数
         self.num_epochs = 10                                            # epoch数
@@ -73,6 +74,15 @@ class Decoder(nn.Module):
         if word_prediction:
             out = self.lsm(out)
         return out
+
+    def load_cls(self, config):
+        bert_model = BertForMaskedLM.from_pretrained(config.bert_path)
+        bert_model.resize_token_embeddings(len(config.tokenizer))
+        cls_weight = bert_model.cls.predictions.decoder.weight
+        cls_bias = bert_model.cls.predictions.decoder.bias
+        with torch.no_grad():
+            self.classifier.weight.copy_(cls_weight)
+            self.classifier.bias.copy_(cls_bias)
 
     def update_classifier(self, indices):
         _nwd = indices.numel()
