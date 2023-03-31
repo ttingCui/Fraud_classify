@@ -29,7 +29,7 @@ class MyDataset(Dataset):
                 "labels": label}
 
 # 加载模型数据
-def load_data(filename):
+def loadData(filename):
     contents = []
     labels = []
     with open(filename, 'r', encoding='UTF-8') as f:
@@ -57,7 +57,7 @@ def makeDataset(batch_size, texts, labels, tokenizer):
     )
     return data_loader
 
-def ret_loader(filename, tokenizer, batch_size):
-    contents, labels = load_data(filename)
+def retLoader(filename, tokenizer, batch_size):
+    contents, labels = loadData(filename)
     loader = makeDataset(batch_size, contents, labels, tokenizer)
     return loader
