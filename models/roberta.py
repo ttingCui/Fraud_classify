@@ -19,8 +19,8 @@ class Config(object):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
 
         self.num_classes = len(self.class_list)                         # 类别数
-        self.num_epochs = 3                                             # epoch数
-        self.batch_size = 64                                            # mini-batch大小
+        self.num_epochs = 10                                             # epoch数
+        self.batch_size = 4                                            # mini-batch大小
         self.learning_rate = 5e-5                                       # 学习率
         self.bert_path = 'hfl/chinese-roberta-wwm-ext'
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)

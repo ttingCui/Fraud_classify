@@ -36,4 +36,4 @@ def _get_logger(filename, level='info'):
     return log
 
 # 明确指定日志输出的文件路径和日志级别
-logger = _get_logger('./logs/test.log', 'info')
+logger = _get_logger('prompt/logs/test.log', 'info')

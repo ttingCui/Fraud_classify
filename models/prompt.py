@@ -23,8 +23,9 @@ class Config(object):
 
         self.num_classes = len(self.class_list)                         # 类别数
         self.num_epochs = 10                                            # epoch数
-        self.batch_size = 8                                             # mini-batch大小
+        self.batch_size = 4                                             # mini-batch大小
         self.learning_rate = 5e-5                                       # 学习率
+        # self.learning_rate = 1e-5                                       # 学习率
         self.bert_path = 'bert-base-chinese'
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
         self.hidden_size = 768
@@ -65,7 +66,6 @@ class MyBertModel(nn.Module):
         # output: MaskedLMOutput [bsize, sql, hidden]
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         outputs = outputs.last_hidden_state
-        # outputs = outputs.logits
         # polled_output: [batchsize, hidden]
         pooled_output = outputs[_mask]
         # logits: [batchsize, classvocabnum]
@@ -99,17 +99,17 @@ class classify(nn.Module):
         self.transform = bert_transform
 
     # 更新classifier
-    def update_classifier(self, indices):
+    def update_classifier(self, indices, labellen=4):
         # _nwd = len(indices_list)
-        _nwd = indices.numel() // 4
+        _nwd = indices.numel() // labellen
         _classifier = nn.Linear(self.decoder.weight.size(-1), _nwd, bias=self.decoder.bias is not None)
 
         with torch.no_grad():
             weight = self.decoder.weight.index_select(0, indices)
-            weight = weight.view( _nwd, 4, self.decoder.weight.size(-1)).mean(dim=1)
+            weight = weight.view(_nwd, labellen, self.decoder.weight.size(-1)).mean(dim=1)
             _classifier.weight.copy_(weight)
             if self.decoder.bias is not None:
                 bias = self.decoder.bias.index_select(0, indices)
-                bias = bias.view(_nwd, 4).mean(dim=1)
+                bias = bias.view(_nwd, labellen).mean(dim=1)
                 _classifier.bias.copy_(bias)
         self.decoder = _classifier

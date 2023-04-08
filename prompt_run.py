@@ -4,6 +4,7 @@
 # 2023/3/10 22:14
 
 import sys
+import os
 import torch
 import torch.nn as nn
 
@@ -15,7 +16,7 @@ from torch.utils.data import Dataset
 
 
 
-def train(model, train_loader, val_loader, test_loader, optimizer, criterion, config, log_interval=10, eval_interval=20):
+def train(model, train_loader, val_loader, test_loader, optimizer, criterion, config, log_interval=5, eval_interval=10):
     device = config.device
     model.to(device)
     best_val_acc = 0.0
@@ -60,6 +61,9 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
                     best_model_params = model.state_dict()
                     torch.save(best_model_params, config.save_path)
 
+    if os.path.exists(config.save_path):
+        model_state_dict = torch.load(config.save_path, map_location=torch.device('cpu'))
+        model.load_state_dict(model_state_dict)
     test_loss, test_acc = evaluate(model, test_loader, criterion, device)
 
     logger.info(f'Test loss: {test_loss:.4f}, Test accuracy: {test_acc:.4f}')
@@ -94,7 +98,22 @@ def evaluate(model, dataloader, criterion, device):
     accuracy = total_correct / total_count
 
     return avg_loss, accuracy
-
+# labeldict = {
+#     "0": "贷款",
+#     "1": "网络",
+#     "2": "广告",
+#     "3": "房产",
+#     "4": "零售",
+#     "5": "金融",
+#     "6": "欺诈",
+#     "7": "银行",
+#     "8": "钓鱼",
+#     "9": "陪护",
+#     "10": "证票",
+#     "11": "赌博",
+#     "12": "政治",
+#     "13": "私人",
+# }
 # labeldict = {
 #     "0": "贷款广告",
 #     "1": "网络广告",
@@ -111,33 +130,33 @@ def evaluate(model, dataloader, criterion, device):
 #     "12": "非法政治",
 #     "13": "私人交流",
 # }
-labeldict = {
-    "0": "[MASK0]",
-    "1": "[MASK1]",
-    "2": "[MASK2]",
-    "3": "[MASK3]",
-    "4": "[MASK4]",
-    "5": "[MASK5]",
-    "6": "[MASK6]",
-    "7": "[MASK7]",
-    "8": "[MASK8]",
-    "9": "[MASK9]",
-    "10": "[MASK10]",
-    "11": "[MASK11]",
-    "12": "[MASK12]",
-    "13": "[MASK13]",
-}
+# labeldict = {
+#     "0": "[MASK0]",
+#     "1": "[MASK1]",
+#     "2": "[MASK2]",
+#     "3": "[MASK3]",
+#     "4": "[MASK4]",
+#     "5": "[MASK5]",
+#     "6": "[MASK6]",
+#     "7": "[MASK7]",
+#     "8": "[MASK8]",
+#     "9": "[MASK9]",
+#     "10": "[MASK10]",
+#     "11": "[MASK11]",
+#     "12": "[MASK12]",
+#     "13": "[MASK13]",
+# }
 sentence = "该短信涉及"
 # 加载数据集位置 获取相关配置信息
-# dataset = sys.argv[1]
-dataset = "message/fewshotdata_8"
+dataset = sys.argv[1]
+# dataset = "message/new_data/fewshot_4"
 config = Config(dataset)
 
 # 加载预训练模型
 model = MyBertModel(config)
 model.cls.load_cls(config)
 indices_list = []
-with open("label_id.txt", 'r', encoding="UTF-8") as f:
+with open("label_id_2.txt", 'r', encoding="UTF-8") as f:
     for line in f.readlines():
         # indices = []
         line = line.strip()
@@ -147,16 +166,18 @@ with open("label_id.txt", 'r', encoding="UTF-8") as f:
 
 
 # model.cls.update_classifier(indices_list)
-model.cls.update_classifier(torch.as_tensor(indices_list, dtype=torch.long))
+model.cls.update_classifier(torch.as_tensor(indices_list, dtype=torch.long), labellen=2)
 # 定义优化器
+# Adam betas=(0.9, 0.98,), eps=1e-9
 optimizer = torch.optim.Adam(model.parameters(), config.learning_rate)
+# optimizer = torch.optim.Adam(model.parameters(), config.learning_rate, betas=(0.9, 0.98,), eps=1e-9)
 # 定义损失函数
 criterion = nn.CrossEntropyLoss()
 # 将模型移到对应设备上
 model.to(config.device)
 # 将数据传递给DataLoader
 train_dataloader = retLoaderLabel(config.train_path, config.tokenizer, config.batch_size, sentence)
-dev_dataloader = retLoaderLabel(config.train_path, config.tokenizer, config.batch_size, sentence)
-test_dataloader = retLoaderLabel(config.train_path, config.tokenizer, config.batch_size, sentence)
+dev_dataloader = retLoaderLabel(config.dev_path, config.tokenizer, config.batch_size, sentence)
+test_dataloader = retLoaderLabel(config.test_path, config.tokenizer, config.batch_size, sentence)
 # 训练
 train(model, train_dataloader, dev_dataloader, test_dataloader, optimizer, criterion, config)

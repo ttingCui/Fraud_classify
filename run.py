@@ -2,10 +2,11 @@
 # 2023/3/10 22:14
 
 import sys
+import os
 import torch
 import torch.nn as nn
 
-from read_data import ret_loader
+from read_data import retLoader
 from models.bert import Config, BertClassifier
 from logger import logger
 
@@ -13,7 +14,7 @@ from torch.utils.data import Dataset
 
 
 
-def train(model, train_loader, val_loader, test_loader, optimizer, criterion, config, log_interval=20, eval_interval=200):
+def train(model, train_loader, val_loader, test_loader, optimizer, criterion, config, log_interval=5, eval_interval=10):
     device = config.device
     model.to(device)
     best_val_acc = 0.0
@@ -56,6 +57,9 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
                     best_model_params = model.state_dict()
                     torch.save(best_model_params, config.save_path)
 
+    if os.path.exists(config.save_path):
+        model_state_dict = torch.load(config.save_path, map_location=torch.device('cpu'))
+        model.load_state_dict(model_state_dict)
     test_loss, test_acc = evaluate(model, test_loader, criterion, device)
 
     logger.info(f'Test loss: {test_loss:.4f}, Test accuracy: {test_acc:.4f}')
@@ -88,11 +92,17 @@ def evaluate(model, dataloader, criterion, device):
     avg_loss = total_loss / total_count
     accuracy = total_correct / total_count
 
+    # Precision = (预测为1且正确预测的样本数) / (所有预测为1的样本数) = TP / (TP + FP)
+    # precision =
+    # Recall = (预测为1且正确预测的样本数) / (所有真实情况为1的样本数) = TP / (TP + FN)
+    # recall =
+
     return avg_loss, accuracy
 
 
 # 加载数据集位置 获取相关配置信息
 dataset = sys.argv[1]
+# dataset = "message/new_data/fewshot_4"
 config = Config(dataset)
 # 加载预训练模型
 model = BertClassifier(config)
@@ -103,8 +113,8 @@ criterion = nn.CrossEntropyLoss()
 # 将模型移到对应设备上
 model.to(config.device)
 # 将数据传递给DataLoader
-train_dataloader = ret_loader(config.train_path, config.tokenizer, config.batch_size)
-dev_dataloader = ret_loader(config.dev_path, config.tokenizer, config.batch_size)
-test_dataloader = ret_loader(config.test_path, config.tokenizer, config.batch_size)
+train_dataloader = retLoader(config.train_path, config.tokenizer, config.batch_size)
+dev_dataloader = retLoader(config.dev_path, config.tokenizer, config.batch_size)
+test_dataloader = retLoader(config.test_path, config.tokenizer, config.batch_size)
 # 训练
 train(model, train_dataloader, dev_dataloader, test_dataloader, optimizer, criterion, config)
