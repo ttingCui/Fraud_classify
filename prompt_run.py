@@ -130,22 +130,7 @@ def evaluate(model, dataloader, criterion, device):
 #     "12": "非法政治",
 #     "13": "私人交流",
 # }
-# labeldict = {
-#     "0": "[MASK0]",
-#     "1": "[MASK1]",
-#     "2": "[MASK2]",
-#     "3": "[MASK3]",
-#     "4": "[MASK4]",
-#     "5": "[MASK5]",
-#     "6": "[MASK6]",
-#     "7": "[MASK7]",
-#     "8": "[MASK8]",
-#     "9": "[MASK9]",
-#     "10": "[MASK10]",
-#     "11": "[MASK11]",
-#     "12": "[MASK12]",
-#     "13": "[MASK13]",
-# }
+
 sentence = "该短信涉及"
 # 加载数据集位置 获取相关配置信息
 dataset = sys.argv[1]
@@ -156,7 +141,7 @@ config = Config(dataset)
 model = MyBertModel(config)
 model.cls.load_cls(config)
 indices_list = []
-with open("label_id_2.txt", 'r', encoding="UTF-8") as f:
+with open("label_id_textrank.txt", 'r', encoding="UTF-8") as f:
     for line in f.readlines():
         # indices = []
         line = line.strip()
