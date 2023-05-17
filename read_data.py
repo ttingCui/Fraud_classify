@@ -43,6 +43,22 @@ def loadData(filename):
             labels.append(int(label))
     return contents, labels
 
+# 加载模型数据(前面增加标签词版本)
+def loadDataAddLabel(filename):
+    contents = []
+    labels = []
+    class_list = [x.strip() for x in open('message/data/class_zh.txt', encoding='UTF-8').readlines()]
+    with open(filename, 'r', encoding='UTF-8') as f:
+        for line in tqdm(f):
+            lin = line.strip()
+            if not lin:
+                continue
+            # 划分文本内容和分类标签
+            content, label = lin.split('\t')
+            contents.append(class_list[int(label)]+content)
+            labels.append(int(label))
+    return contents, labels
+
 # 返回dataloader
 def makeDataset(batch_size, texts, labels, tokenizer):
     # 创建一个 DataCollatorWithPadding
@@ -57,7 +73,10 @@ def makeDataset(batch_size, texts, labels, tokenizer):
     )
     return data_loader
 
-def retLoader(filename, tokenizer, batch_size):
-    contents, labels = loadData(filename)
+def retLoader(filename, tokenizer, batch_size, add_label=False):
+    if add_label:
+        contents, labels = loadDataAddLabel(filename)
+    else:
+        contents, labels = loadData(filename)
     loader = makeDataset(batch_size, contents, labels, tokenizer)
     return loader

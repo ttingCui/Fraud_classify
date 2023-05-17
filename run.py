@@ -92,11 +92,6 @@ def evaluate(model, dataloader, criterion, device):
     avg_loss = total_loss / total_count
     accuracy = total_correct / total_count
 
-    # Precision = (预测为1且正确预测的样本数) / (所有预测为1的样本数) = TP / (TP + FP)
-    # precision =
-    # Recall = (预测为1且正确预测的样本数) / (所有真实情况为1的样本数) = TP / (TP + FN)
-    # recall =
-
     return avg_loss, accuracy
 
 
@@ -104,6 +99,7 @@ def evaluate(model, dataloader, criterion, device):
 dataset = sys.argv[1]
 # dataset = "message/new_data/fewshot_4"
 config = Config(dataset)
+add_label = True
 # 加载预训练模型
 model = BertClassifier(config)
 # 定义优化器
@@ -113,8 +109,8 @@ criterion = nn.CrossEntropyLoss()
 # 将模型移到对应设备上
 model.to(config.device)
 # 将数据传递给DataLoader
-train_dataloader = retLoader(config.train_path, config.tokenizer, config.batch_size)
-dev_dataloader = retLoader(config.dev_path, config.tokenizer, config.batch_size)
-test_dataloader = retLoader(config.test_path, config.tokenizer, config.batch_size)
+train_dataloader = retLoader(config.train_path, config.tokenizer, config.batch_size, add_label)
+dev_dataloader = retLoader(config.dev_path, config.tokenizer, config.batch_size, add_label)
+test_dataloader = retLoader(config.test_path, config.tokenizer, config.batch_size, add_label)
 # 训练
 train(model, train_dataloader, dev_dataloader, test_dataloader, optimizer, criterion, config)
