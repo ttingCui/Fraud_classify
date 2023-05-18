@@ -10,9 +10,6 @@ from read_data import retLoader
 from models.bert import Config, BertClassifier
 from logger import logger
 
-from torch.utils.data import Dataset
-
-
 
 def train(model, train_loader, val_loader, test_loader, optimizer, criterion, config, log_interval=5, eval_interval=10):
     device = config.device
@@ -56,6 +53,19 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
                     best_val_acc = val_acc
                     best_model_params = model.state_dict()
                     torch.save(best_model_params, config.save_path)
+                    config.counter = 0
+                else:
+                    config.counter = config.counter + 1
+
+            if config.counter >= config.patience:
+                print("Validation performance did not improve for {} eval. Training stopped.".format(config.patience))
+                stop_training = True
+                break
+
+                # ...
+
+        if stop_training:
+            break
 
     if os.path.exists(config.save_path):
         model_state_dict = torch.load(config.save_path, map_location=torch.device('cpu'))
