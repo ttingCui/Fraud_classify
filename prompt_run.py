@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 
 from read_data_prompt import retLoaderLabel
-from models.prompt import Config, MyBertModel
+from models.prompt_bert import Config, MyBertModel
 from logger import logger
 
 from torch.utils.data import Dataset
@@ -23,6 +23,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
     train_losses = []
     val_losses = []
     val_accs = []
+    stop_training = False
 
     for epoch in range(config.num_epochs):
         running_loss = 0.0
@@ -41,7 +42,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
             running_loss += loss.item()
 
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 
             optimizer.step()
 
@@ -60,6 +61,19 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
                     best_val_acc = val_acc
                     best_model_params = model.state_dict()
                     torch.save(best_model_params, config.save_path)
+                    config.counter = 0
+                else:
+                    config.counter = config.counter + 1
+
+            if config.counter >= config.patience:
+                print("Validation performance did not improve for {} eval. Training stopped.".format(config.patience))
+                stop_training = True
+                break
+
+                # ...
+
+        if stop_training:
+            break
 
     if os.path.exists(config.save_path):
         model_state_dict = torch.load(config.save_path, map_location=torch.device('cpu'))
@@ -141,7 +155,7 @@ config = Config(dataset)
 model = MyBertModel(config)
 model.cls.load_cls(config)
 indices_list = []
-with open("label_id_textrank.txt", 'r', encoding="UTF-8") as f:
+with open("label_id_2.txt", 'r', encoding="UTF-8") as f:
     for line in f.readlines():
         # indices = []
         line = line.strip()
