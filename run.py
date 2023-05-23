@@ -18,6 +18,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
     train_losses = []
     val_losses = []
     val_accs = []
+    stop_training = False
 
     for epoch in range(config.num_epochs):
         running_loss = 0.0
@@ -61,9 +62,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
                 print("Validation performance did not improve for {} eval. Training stopped.".format(config.patience))
                 stop_training = True
                 break
-
                 # ...
-
         if stop_training:
             break
 
@@ -107,9 +106,9 @@ def evaluate(model, dataloader, criterion, device):
 
 # 加载数据集位置 获取相关配置信息
 dataset = sys.argv[1]
-# dataset = "message/new_data/fewshot_4"
+# dataset = "case/fewshot_4"
 config = Config(dataset)
-add_label = True
+add_label = False
 # 加载预训练模型
 model = BertClassifier(config)
 # 定义优化器
@@ -120,7 +119,7 @@ criterion = nn.CrossEntropyLoss()
 model.to(config.device)
 # 将数据传递给DataLoader
 train_dataloader = retLoader(config.train_path, config.tokenizer, config.batch_size, add_label)
-dev_dataloader = retLoader(config.dev_path, config.tokenizer, config.batch_size, add_label)
-test_dataloader = retLoader(config.test_path, config.tokenizer, config.batch_size, add_label)
+dev_dataloader = retLoader(config.dev_path, config.tokenizer, config.batch_size)
+test_dataloader = retLoader(config.test_path, config.tokenizer, config.batch_size)
 # 训练
 train(model, train_dataloader, dev_dataloader, test_dataloader, optimizer, criterion, config)
