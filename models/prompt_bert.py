@@ -26,8 +26,8 @@ class Config(object):
         self.counter = 0
         self.patience = 5
         self.batch_size = 4                                             # mini-batch大小
-        self.learning_rate = 5e-5                                       # 学习率
-        # self.learning_rate = 1e-5                                       # 学习率
+        # self.learning_rate = 5e-5                                       # 学习率
+        self.learning_rate = 1e-5                                       # 学习率
         self.bert_path = 'bert-base-chinese'
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
         self.hidden_size = 768
@@ -114,4 +114,41 @@ class classify(nn.Module):
                 bias = self.decoder.bias.index_select(0, indices)
                 bias = bias.view(_nwd, labellen).mean(dim=1)
                 _classifier.bias.copy_(bias)
+        self.decoder = _classifier
+
+    # 更新classifier，类别文字长度不同版
+    def update_classifier_chunk(self, indices, chunk_sizes):
+        _nwd = len(chunk_sizes)
+        _classifier = nn.Linear(self.decoder.weight.size(-1), _nwd, bias=self.decoder.bias is not None)
+
+        with torch.no_grad():
+            weight = self.decoder.weight.index_select(0, indices)
+            start_idx = 0
+            averaged_chunks = []
+            for size in chunk_sizes:
+                end_idx = start_idx + size
+                chunk = weight[start_idx:end_idx]
+                averaged_chunk = torch.mean(chunk, dim=0)
+                averaged_chunks.append(averaged_chunk)
+                start_idx = end_idx
+
+            # weight_averaged = torch.cat(averaged_chunks, dim=0)
+            weight_averaged = torch.stack(averaged_chunks, dim=0)
+            _classifier.weight.copy_(weight_averaged)
+
+            if self.decoder.bias is not None:
+                bias = self.decoder.bias.index_select(0, indices)
+                start_idx = 0
+                averaged_chunks = []
+                for size in chunk_sizes:
+                    end_idx = start_idx + size
+                    chunk = bias[start_idx:end_idx]
+                    averaged_chunk = torch.mean(chunk, dim=0)
+                    averaged_chunks.append(averaged_chunk)
+                    start_idx = end_idx
+
+                # bias_averaged = torch.cat(averaged_chunks, dim=0)
+                bias_averaged = torch.stack(averaged_chunks, dim=0)
+                _classifier.bias.copy_(bias_averaged)
+
         self.decoder = _classifier

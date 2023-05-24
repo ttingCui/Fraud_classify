@@ -3,7 +3,6 @@
 
 from read_data import *
 
-
 class DataGeneLabel(Dataset):
     def __init__(self, texts, labels, tokenizer, sentence):
         self.texts = texts
@@ -15,7 +14,7 @@ class DataGeneLabel(Dataset):
         return len(self.texts)
 
     def __getitem__(self, idx):
-        text = self.texts[idx] + self.sentence + '[MASK]'
+        text = self.sentence[0] + self.texts[idx] + self.sentence[1] + '[MASK]'
         label = self.labels[idx]
         # inputs = self.tokenizer(self.texts[idx], truncation=True, padding='max_length', max_length=128,
         #                         return_tensors='pt')

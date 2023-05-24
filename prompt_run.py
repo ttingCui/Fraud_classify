@@ -42,7 +42,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, criterion, co
             running_loss += loss.item()
 
             loss.backward()
-            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 
             optimizer.step()
 
@@ -145,27 +145,33 @@ def evaluate(model, dataloader, criterion, device):
 #     "13": "私人交流",
 # }
 
-sentence = "该短信涉及"
+sentence = ["短信:", "类别:"]
 # 加载数据集位置 获取相关配置信息
 dataset = sys.argv[1]
+label = sys.argv[2]
 # dataset = "message/new_data/fewshot_4"
+# dataset = "case/fewshot_4"
 config = Config(dataset)
 
 # 加载预训练模型
 model = MyBertModel(config)
 model.cls.load_cls(config)
 indices_list = []
-with open("label_id_2.txt", 'r', encoding="UTF-8") as f:
+chunk_sizes = []
+with open(label, 'r', encoding="UTF-8") as f:
     for line in f.readlines():
         # indices = []
         line = line.strip()
         # indices.extend([int(i) for i in line.split(" ")])
         indices_list.extend(int(i) for i in line.split(" "))
-        # indices_list.append(indices)
+        chunk_sizes.append(len(line.strip().split(" ")))
+    # chunk_sizes = [len(line.strip().split(" ")) for line in f.readlines()]
 
 
 # model.cls.update_classifier(indices_list)
-model.cls.update_classifier(torch.as_tensor(indices_list, dtype=torch.long), labellen=2)
+# model.cls.update_classifier(torch.as_tensor(indices_list, dtype=torch.long), labellen=2)
+# chunk_sizes = [4, 8, 8, 7, 4, 6, 10, 6, 10, 6, 9, 4]
+model.cls.update_classifier_chunk(torch.as_tensor(indices_list, dtype=torch.long), chunk_sizes)
 # 定义优化器
 # Adam betas=(0.9, 0.98,), eps=1e-9
 optimizer = torch.optim.Adam(model.parameters(), config.learning_rate)
