@@ -1,0 +1,4 @@
+2023-03-27 15:32:04,898 promptrun.py[line:63] - INFO: Test loss: 0.6764, Test accuracy: 0.8354
+2023-03-27 19:50:07,491 promptrun.py[line:63] - INFO: Test loss: 0.6624, Test accuracy: 0.8366
+2023-03-27 20:52:02,563 promptrun.py[line:48] - INFO: Epoch [1/10] Batch [20] Loss: 2.2688
+2023-03-27 21:04:37,452 promptrun.py[line:48] - INFO: Epoch [2/10] Batch [20] Loss: 0.5576

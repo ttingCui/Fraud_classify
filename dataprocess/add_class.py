@@ -14,7 +14,7 @@ def addclass(classdic, fileindir, fileoutdir):
                 line = line.replace("\n", "")
                 f2.write(line)
                 f2.write("\t")
-                f2.write(str(classdic[filename]))
+                f2.write(str(classdic[filename.replace(".txt", "")]))
                 f2.write("\n")
 
 
@@ -33,5 +33,7 @@ def getclass(fileclass):
 
 
 if __name__ == '__main__':
-    class_dic = getclass("../message/data/class.txt")
-    addclass(class_dic, "../cache/data_del_space", "../cache/data_class")
+    # class_dic = getclass("../message/data/class.txt")
+    # addclass(class_dic, "../cache/data_del_space", "../cache/data_class")
+    class_dic = getclass("../cache/case_data/class.txt")
+    addclass(class_dic, "../cache/case_same", "../cache/case_class")
